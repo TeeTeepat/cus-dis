@@ -1,0 +1,615 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;600&family=IBM+Plex+Sans+Thai:wght@400;500&display=swap');
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --brand: #1D9E75; --brand-light: #E1F5EE; --brand-dark: #085041;
+  --surface: var(--color-background-primary); --muted: var(--color-background-secondary);
+  --border: var(--color-border-tertiary); --text: var(--color-text-primary); --sub: var(--color-text-secondary);
+  --radius: var(--border-radius-lg);
+}
+.survey-wrap { font-family: 'IBM Plex Sans Thai', sans-serif; max-width: 680px; margin: 0 auto; padding: 0 0 3rem; }
+.survey-header { padding: 2rem 0 1.5rem; border-bottom: 0.5px solid var(--border); margin-bottom: 2rem; }
+.survey-header .tag { display: inline-block; background: var(--brand-light); color: var(--brand-dark); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 100px; margin-bottom: 12px; }
+.survey-header h1 { font-family: 'Noto Serif Thai', serif; font-size: 26px; font-weight: 600; color: var(--text); line-height: 1.35; margin-bottom: 8px; }
+.survey-header p { font-size: 14px; color: var(--sub); line-height: 1.6; }
+.progress-bar { height: 3px; background: var(--muted); border-radius: 99px; margin-bottom: 2rem; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--brand); border-radius: 99px; transition: width 0.4s ease; }
+.progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--sub); margin-bottom: 8px; }
+.q-block { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+.q-num { font-size: 11px; font-weight: 500; color: var(--brand); letter-spacing: 0.08em; margin-bottom: 6px; }
+.q-text { font-size: 15px; color: var(--text); line-height: 1.6; margin-bottom: 1rem; }
+.q-note { background: var(--muted); border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 0.75rem; }
+.q-note:last-child { margin-bottom: 0; }
+.q-note label { font-size: 12px; color: var(--sub); display: block; margin-bottom: 6px; }
+.q-note textarea { width: 100%; font-size: 14px; font-family: inherit; resize: vertical; min-height: 64px; background: transparent; border: none; outline: none; color: var(--text); line-height: 1.5; }
+.q-note input[type=text] { width: 100%; font-size: 14px; font-family: inherit; background: transparent; border: none; border-bottom: 0.5px solid var(--border); outline: none; color: var(--text); padding: 4px 0; }
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.chip { display: inline-flex; align-items: center; padding: 5px 12px; border: 0.5px solid var(--border); border-radius: 100px; font-size: 13px; color: var(--text); background: var(--surface); cursor: pointer; transition: all 0.15s; user-select: none; }
+.chip:hover { border-color: var(--brand); color: var(--brand-dark); background: var(--brand-light); }
+.chip.selected { background: var(--brand-light); border-color: var(--brand); color: var(--brand-dark); font-weight: 500; }
+.other-input { display: none; width: 100%; font-size: 13px; font-family: inherit; background: transparent; border: none; border-bottom: 0.5px solid var(--border); outline: none; color: var(--text); padding: 4px 0; margin-top: 8px; }
+.other-input.visible { display: block; }
+.yn-row { display: flex; gap: 8px; margin-top: 4px; }
+.yn-btn { flex: 1; padding: 0.55rem 1rem; border: 0.5px solid var(--border); border-radius: 6px; background: var(--muted); color: var(--text); font-size: 14px; font-family: inherit; cursor: pointer; transition: all 0.15s; text-align: center; }
+.yn-btn:hover { background: var(--brand-light); border-color: var(--brand); color: var(--brand-dark); }
+.yn-btn.yn-yes.selected { background: var(--brand-light); border-color: var(--brand); color: var(--brand-dark); font-weight: 500; }
+.yn-btn.yn-no.selected { background: #FAEEDA; border-color: #EF9F27; color: #633806; font-weight: 500; }
+.branch-row { display: flex; gap: 8px; margin: 0.75rem 0; flex-wrap: wrap; }
+.branch-btn { flex: 1; min-width: 100px; padding: 0.6rem 1rem; border: 0.5px solid var(--border); border-radius: 6px; background: var(--muted); color: var(--text); font-size: 14px; font-family: inherit; cursor: pointer; transition: all 0.15s; text-align: center; }
+.branch-btn:hover { background: var(--brand-light); border-color: var(--brand); color: var(--brand-dark); }
+.branch-btn.selected { background: var(--brand-light); border-color: var(--brand); color: var(--brand-dark); font-weight: 500; }
+.branch-section { border-left: 2px solid var(--brand); padding-left: 1rem; margin-top: 0.75rem; display: none; }
+.branch-section.visible { display: block; }
+.follow-note { background: var(--muted); border-radius: 6px; padding: 0.75rem 1rem; margin-top: 0.75rem; }
+.follow-note label { font-size: 12px; color: var(--sub); display: block; margin-bottom: 6px; }
+.follow-note textarea { width: 100%; font-size: 14px; font-family: inherit; resize: vertical; min-height: 56px; background: transparent; border: none; outline: none; color: var(--text); line-height: 1.5; }
+.actions { display: flex; gap: 12px; margin-top: 2rem; justify-content: flex-end; }
+.btn-primary { padding: 0.6rem 1.5rem; border: none; border-radius: 6px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; transition: opacity 0.15s; }
+.btn-primary:hover { opacity: 0.88; }
+.btn-secondary { padding: 0.6rem 1.25rem; border: 0.5px solid var(--border); border-radius: 6px; background: transparent; color: var(--sub); font-size: 14px; font-family: inherit; cursor: pointer; }
+.btn-excel { padding: 0.6rem 1.25rem; border: 0.5px solid var(--brand); border-radius: 6px; background: var(--brand-light); color: var(--brand-dark); font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.15s; }
+.btn-excel:hover { background: var(--brand); color: #fff; }
+.success-card { background: var(--brand-light); border: 0.5px solid var(--brand); border-radius: var(--radius); padding: 2rem; text-align: center; display: none; }
+.success-card.show { display: block; }
+.success-card h2 { font-size: 20px; color: var(--brand-dark); margin-bottom: 8px; font-weight: 500; }
+.success-card p { font-size: 14px; color: var(--brand-dark); opacity: 0.8; }
+.admin-panel { margin-top: 2rem; border-top: 0.5px solid var(--border); padding-top: 1.5rem; }
+.admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.rejected-note { background: #FAEEDA; border: 0.5px solid #EF9F27; border-radius: var(--radius); padding: 1rem 1.5rem; display: none; }
+.rejected-note.show { display: block; }
+.rejected-note p { font-size: 14px; color: #633806; line-height: 1.6; }
+</style>
+
+<div class="survey-wrap">
+  <div class="survey-header">
+    <span class="tag">CUSTOMER DISCOVERY</span>
+    <h1>การเรียนภาษาของคนทำงาน</h1>
+    <p>ใช้เวลาประมาณ 10 นาที · ไม่มีข้อถูกหรือผิด · ข้อมูลใช้เพื่องานวิจัยเท่านั้น</p>
+  </div>
+
+  <div id="survey-form">
+    <div class="progress-label">
+      <span id="prog-label">ความคืบหน้า 0%</span>
+      <span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+
+    <!-- SCREEN GATE -->
+    <div id="screen-gate" class="q-block">
+      <div class="q-num">คัดกรอง</div>
+      <div class="q-text">ก่อนเริ่ม ขอถามสั้นๆ 2 ข้อนะครับ</div>
+      <div class="q-note">
+        <label>S1 · คุณทำงานประจำอยู่ไหมครับ? และบางครั้งต้องใช้ภาษาต่างประเทศในงานไหม?</label>
+        <div class="branch-row">
+          <button class="branch-btn" onclick="setScreen1('yes',this)">ใช่</button>
+          <button class="branch-btn" onclick="setScreen1('no',this)">ไม่ใช่</button>
+        </div>
+      </div>
+      <div id="s2-wrap" style="display:none">
+        <div class="q-note">
+          <label>S2 · เคยลองใช้แอปหรือวิธีอะไรเรียนภาษาบ้างไหมครับ ช่วง 1-2 ปีที่ผ่านมา?</label>
+          <div class="branch-row">
+            <button class="branch-btn" onclick="setScreen2('yes',this)">เคย</button>
+            <button class="branch-btn" onclick="setScreen2('no',this)">ไม่เคย</button>
+          </div>
+        </div>
+      </div>
+      <div id="rejected" class="rejected-note" style="margin-top:12px">
+        <p>ขอบคุณมากนะครับ ขออภัยที่รบกวนเวลา เนื่องจากงานวิจัยนี้ต้องการผู้ที่ทำงานประจำและเคยลองเรียนภาษามาก่อนครับ</p>
+      </div>
+    </div>
+
+    <div id="main-form" style="display:none">
+
+      <!-- Q1 -->
+      <div class="q-block">
+        <div class="q-num">Q1</div>
+        <div class="q-text">ทำงานอะไรอยู่ครับ? แล้วภาษาต่างประเทศที่ใช้ในงานคือภาษาอะไร?</div>
+        <div class="q-note">
+          <label>ทำงานอะไรอยู่ครับ?</label>
+          <input type="text" id="q1_job" placeholder="เช่น นักการตลาด, วิศวกร, ครู..." oninput="updateProgress()">
+        </div>
+        <div class="q-note">
+          <label>ภาษาที่ใช้ในงาน (เลือกได้มากกว่า 1)</label>
+          <div class="chip-group">
+            <span class="chip" onclick="toggleChip(this,'q1_lang')">อังกฤษ</span>
+            <span class="chip" onclick="toggleChip(this,'q1_lang')">จีน</span>
+            <span class="chip" onclick="toggleChip(this,'q1_lang')">ญี่ปุ่น</span>
+            <span class="chip" onclick="toggleChip(this,'q1_lang')">เกาหลี</span>
+            <span class="chip" onclick="toggleChip(this,'q1_lang')">ฝรั่งเศส</span>
+            <span class="chip" onclick="toggleChip(this,'q1_lang')">เยอรมัน</span>
+            <span class="chip other-chip" onclick="toggleChipOther(this,'q1_lang','q1_lang_other')">อื่นๆ</span>
+          </div>
+          <input class="other-input" id="q1_lang_other" placeholder="ระบุภาษา..." oninput="updateProgress()">
+        </div>
+        <div class="q-note">
+          <label>ส่วนที่ต้องใช้บ่อยที่สุด (เลือกได้มากกว่า 1)</label>
+          <div class="chip-group">
+            <span class="chip" onclick="toggleChip(this,'q1_skill')">พูด</span>
+            <span class="chip" onclick="toggleChip(this,'q1_skill')">ฟัง</span>
+            <span class="chip" onclick="toggleChip(this,'q1_skill')">เขียน</span>
+            <span class="chip" onclick="toggleChip(this,'q1_skill')">อ่าน</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="q-block">
+        <div class="q-num">Q2</div>
+        <div class="q-text">เคยมีประสบการณ์ไหมครับที่รู้สึกว่า "รู้คำนี้แน่ๆ" แต่พอต้องพูดหรือเขียนจริงๆ มันออกมาไม่ได้?</div>
+        <div class="branch-row">
+          <button class="branch-btn" onclick="branch('q2','yes',this)">เคยเจอ</button>
+          <button class="branch-btn" onclick="branch('q2','no',this)">ไม่เคยเจอ</button>
+        </div>
+        <div class="branch-section" id="q2-yes">
+          <div class="q-note"><label>เกิดในสถานการณ์ไหน? อยู่กับใคร?</label><textarea id="q2_situation" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        </div>
+        <div class="branch-section" id="q2-no">
+          <div class="q-note"><label>เห็นคนรอบข้างเป็นแบบนี้บ้างไหม?</label><textarea id="q2_others" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="q-block">
+        <div class="q-num">Q3</div>
+        <div class="q-text">ตอนนี้มีอะไรที่ทำให้คุณรู้สึกว่าต้องพัฒนาภาษาจริงๆ บ้างไหมครับ? มีแรงกดดันอะไรอยู่ไหม?</div>
+        <div class="branch-row">
+          <button class="branch-btn" onclick="branch('q3','yes',this)">มี</button>
+          <button class="branch-btn" onclick="branch('q3','no',this)">ไม่มี</button>
+        </div>
+        <div class="branch-section" id="q3-yes">
+          <div class="q-note">
+            <label>เป็นเรื่องอะไรบ้าง? (เลือกได้มากกว่า 1)</label>
+            <div class="chip-group">
+              <span class="chip" onclick="toggleChip(this,'q3_pressure_type')">เรื่องงาน</span>
+              <span class="chip" onclick="toggleChip(this,'q3_pressure_type')">เรื่องส่วนตัว</span>
+              <span class="chip" onclick="toggleChip(this,'q3_pressure_type')">มี Deadline</span>
+              <span class="chip other-chip" onclick="toggleChipOther(this,'q3_pressure_type','q3_pressure_other')">อื่นๆ</span>
+            </div>
+            <input class="other-input" id="q3_pressure_other" placeholder="ระบุ..." oninput="updateProgress()">
+          </div>
+          <div class="q-note"><label>รายละเอียดเพิ่มเติม</label><textarea id="q3_pressure" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        </div>
+        <div class="branch-section" id="q3-no">
+          <div class="q-note"><label>ถ้ามีวันที่รู้สึกว่า 'ต้องพูดได้แล้ว' วันนั้นคือวันไหน?</label><textarea id="q3_future" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="q-block">
+        <div class="q-num">Q4</div>
+        <div class="q-text">ที่เคยลองเรียนหรือฝึกภาษามา — ตอนต้องใช้จริงๆ มันช่วยได้ไหมครับ? ทำไม?</div>
+        <div class="branch-row">
+          <button class="branch-btn" onclick="branch('q4','yes',this)">ช่วยได้</button>
+          <button class="branch-btn" onclick="branch('q4','no',this)">ช่วยไม่ได้</button>
+        </div>
+        <div class="branch-section" id="q4-yes">
+          <div class="q-note"><label>มีช่วงที่รู้สึกว่าฝึกอยู่ในแอปแต่พอต้องพูดในงานจริง มันยังไม่พอ?</label><textarea id="q4_gap" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        </div>
+        <div class="branch-section" id="q4-no">
+          <div class="q-note"><label>คิดว่าเป็นเพราะอะไรถึงช่วยไม่ได้ตอนต้องใช้จริง?</label><textarea id="q4_why" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="q-block">
+        <div class="q-num">Q5</div>
+        <div class="q-text">สิ่งที่คุณเรียนในแอปหรือคอร์สที่ผ่านมา ตรงกับสถานการณ์ที่คุณต้องใช้จริงๆ ในงานแค่ไหนครับ?</div>
+        <div class="q-note"><label>บันทึก</label><textarea id="q5_note" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        <div class="q-note"><label>ตัวอย่าง 'ใช้จริงได้เลย' vs 'เรียนไปก็ไม่ได้ใช้'</label><textarea id="q5_examples" placeholder="เปรียบเทียบ..." oninput="updateProgress()"></textarea></div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="q-block">
+        <div class="q-num">Q6</div>
+        <div class="q-text">เคยเกิดขึ้นไหมครับ — ฝึกอะไรในแอปแล้วรู้สึก "ทำได้" แต่พอเจอสถานการณ์จริง มันหายไปเลย?</div>
+        <div class="q-note">
+          <label>เคยเกิดขึ้นไหม?</label>
+          <div class="yn-row">
+            <button class="yn-btn yn-yes" onclick="setYN('q6_happened','yes',this)">เคย</button>
+            <button class="yn-btn yn-no" onclick="setYN('q6_happened','no',this)">ไม่เคย</button>
+          </div>
+        </div>
+        <div class="q-note"><label>คิดว่าเป็นเพราะอะไร? มันต่างกันยังไงระหว่างฝึกในแอปกับตอนใช้จริง?</label><textarea id="q6_diff" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="q-block">
+        <div class="q-num">Q7</div>
+        <div class="q-text">Scenario ในงานที่คุณต้องใช้ภาษาบ่อยที่สุดแต่ยังรู้สึก "ไม่มั่นใจ" คืออะไรครับ? เกิดขึ้นบ่อยแค่ไหน?</div>
+        <div class="q-note">
+          <label>Scenario ที่ไม่มั่นใจ (เลือกได้มากกว่า 1)</label>
+          <div class="chip-group">
+            <span class="chip" onclick="toggleChip(this,'q7_scenario')">ประชุมกับต่างชาติ</span>
+            <span class="chip" onclick="toggleChip(this,'q7_scenario')">นำเสนองาน</span>
+            <span class="chip" onclick="toggleChip(this,'q7_scenario')">เขียน Email</span>
+            <span class="chip" onclick="toggleChip(this,'q7_scenario')">คุยโทรศัพท์</span>
+            <span class="chip" onclick="toggleChip(this,'q7_scenario')">เจรจาต่อรอง</span>
+            <span class="chip" onclick="toggleChip(this,'q7_scenario')">Small talk</span>
+            <span class="chip other-chip" onclick="toggleChipOther(this,'q7_scenario','q7_scenario_other')">อื่นๆ</span>
+          </div>
+          <input class="other-input" id="q7_scenario_other" placeholder="ระบุ scenario..." oninput="updateProgress()">
+        </div>
+        <div class="q-note"><label>รายละเอียด — ตอนนั้นคุณต้องพูดอะไร? มันยากตรงไหน?</label><textarea id="q7_detail" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        <div class="q-note">
+          <label>เกิดขึ้นบ่อยแค่ไหน?</label>
+          <div class="chip-group">
+            <span class="chip" onclick="toggleChipSingle(this,'q7_freq')">ทุกวัน</span>
+            <span class="chip" onclick="toggleChipSingle(this,'q7_freq')">2–3 ครั้ง/สัปดาห์</span>
+            <span class="chip" onclick="toggleChipSingle(this,'q7_freq')">สัปดาห์ละครั้ง</span>
+            <span class="chip" onclick="toggleChipSingle(this,'q7_freq')">เดือนละครั้ง</span>
+            <span class="chip other-chip" onclick="toggleChipOtherSingle(this,'q7_freq','q7_freq_other')">อื่นๆ</span>
+          </div>
+          <input class="other-input" id="q7_freq_other" placeholder="ระบุความถี่..." oninput="updateProgress()">
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="q-block">
+        <div class="q-num">Q8</div>
+        <div class="q-text">ถ้าต้องเลือกครับ: เรียนคำศัพท์ใหม่ 50 คำ vs เรียน "ชุดประโยค" สำหรับ 3 สถานการณ์งานจริงของคุณ — คุณเลือกอะไร? ทำไม?</div>
+        <div class="branch-row">
+          <button class="branch-btn" onclick="branch('q8','phrase',this)">ชุดประโยค</button>
+          <button class="branch-btn" onclick="branch('q8','vocab',this)">คำศัพท์</button>
+        </div>
+        <div class="branch-section" id="q8-phrase">
+          <div class="q-note">
+            <label>Situation ไหนที่คุณอยาก 'script' พร้อมใช้มากที่สุด? (เลือกได้มากกว่า 1)</label>
+            <div class="chip-group">
+              <span class="chip" onclick="toggleChip(this,'q8_situation')">ประชุมกับต่างชาติ</span>
+              <span class="chip" onclick="toggleChip(this,'q8_situation')">นำเสนองาน</span>
+              <span class="chip" onclick="toggleChip(this,'q8_situation')">เขียน Email</span>
+              <span class="chip" onclick="toggleChip(this,'q8_situation')">คุยโทรศัพท์</span>
+              <span class="chip" onclick="toggleChip(this,'q8_situation')">เจรจาต่อรอง</span>
+              <span class="chip" onclick="toggleChip(this,'q8_situation')">Small talk</span>
+              <span class="chip other-chip" onclick="toggleChipOther(this,'q8_situation','q8_situation_other')">อื่นๆ</span>
+            </div>
+            <input class="other-input" id="q8_situation_other" placeholder="ระบุ situation..." oninput="updateProgress()">
+          </div>
+          <div class="q-note"><label>รายละเอียดเพิ่มเติม</label><textarea id="q8_scenario" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        </div>
+        <div class="branch-section" id="q8-vocab">
+          <div class="q-note">
+            <label>ถ้าคำพวกนั้นใช้ได้แค่บางบริบท คิดว่าจะ work ไหม?</label>
+            <div class="yn-row">
+              <button class="yn-btn yn-yes" onclick="setYN('q8_vocab_work','yes',this)">น่าจะ work</button>
+              <button class="yn-btn yn-no" onclick="setYN('q8_vocab_work','no',this)">ไม่ work</button>
+            </div>
+          </div>
+          <div class="q-note"><label>เพราะอะไร?</label><textarea id="q8_context" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        </div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="q-block">
+        <div class="q-num">Q9</div>
+        <div class="q-text">ในชีวิตประจำวัน มีเวลาว่างช่วงไหนบ้างที่คุณอาจเปิดแอปฝึกภาษาได้? กี่นาที?</div>
+        <div class="q-note">
+          <label>ช่วงเวลาที่ว่าง (เลือกได้มากกว่า 1)</label>
+          <div class="chip-group">
+            <span class="chip" onclick="toggleChip(this,'q9_when')">เช้าก่อนไปทำงาน</span>
+            <span class="chip" onclick="toggleChip(this,'q9_when')">ระหว่างเดินทาง</span>
+            <span class="chip" onclick="toggleChip(this,'q9_when')">พักเที่ยง</span>
+            <span class="chip" onclick="toggleChip(this,'q9_when')">หลังเลิกงาน</span>
+            <span class="chip" onclick="toggleChip(this,'q9_when')">ก่อนนอน</span>
+            <span class="chip other-chip" onclick="toggleChipOther(this,'q9_when','q9_when_other')">อื่นๆ</span>
+          </div>
+          <input class="other-input" id="q9_when_other" placeholder="ระบุช่วงเวลา..." oninput="updateProgress()">
+        </div>
+        <div class="q-note">
+          <label>กี่นาทีต่อครั้ง?</label>
+          <div class="chip-group">
+            <span class="chip" onclick="toggleChipSingle(this,'q9_min')">น้อยกว่า 5 นาที</span>
+            <span class="chip" onclick="toggleChipSingle(this,'q9_min')">5–10 นาที</span>
+            <span class="chip" onclick="toggleChipSingle(this,'q9_min')">10–20 นาที</span>
+            <span class="chip" onclick="toggleChipSingle(this,'q9_min')">20–30 นาที</span>
+            <span class="chip other-chip" onclick="toggleChipOtherSingle(this,'q9_min','q9_min_other')">อื่นๆ</span>
+          </div>
+          <input class="other-input" id="q9_min_other" placeholder="ระบุจำนวนนาที..." oninput="updateProgress()">
+        </div>
+        <div class="q-note"><label>ตอนนั้นมักทำอะไรอยู่?</label><textarea id="q9_activity" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="q-block">
+        <div class="q-num">Q10</div>
+        <div class="q-text">ถ้าหลังฝึกในแอปแล้ว มีระบบให้ "mission" เล็กๆ ที่ต้องลองทำแบบ roleplay — เช่น "ส่ง email update ชิ้นนี้เป็นภาษาอังกฤษ" คุณคิดว่าจะลองทำไหมครับ?</div>
+        <div class="branch-row">
+          <button class="branch-btn" onclick="branch('q10','yes',this)">น่าจะลอง</button>
+          <button class="branch-btn" onclick="branch('q10','no',this)">ไม่แน่ใจ / ไม่ทำ</button>
+        </div>
+        <div class="branch-section" id="q10-yes">
+          <div class="q-note"><label>อะไรที่ทำให้รู้สึกอยากทำ?</label><textarea id="q10_why_yes" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        </div>
+        <div class="branch-section" id="q10-no">
+          <div class="q-note"><label>อะไรที่ทำให้รู้สึกไม่อยากทำ?</label><textarea id="q10_why_no" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        </div>
+      </div>
+
+      <!-- Q11 -->
+      <div class="q-block">
+        <div class="q-num">Q11</div>
+        <div class="q-text">เคยจ่ายเงินเพื่อฝึกภาษาไหมครับ?</div>
+        <div class="q-note">
+          <label>เคยจ่ายเงินเพื่อฝึกภาษาไหมครับ?</label>
+          <div class="yn-row">
+            <button class="yn-btn yn-yes" onclick="setYN('q11_paid','yes',this)">เคย</button>
+            <button class="yn-btn yn-no" onclick="setYN('q11_paid','no',this)">ไม่เคย</button>
+          </div>
+        </div>
+        <div id="q11_paid_yes" class="branch-section">
+          <div class="q-note">
+            <label>คุ้มค่าไหม?</label>
+            <div class="yn-row">
+              <button class="yn-btn yn-yes" onclick="setYN('q11_worth','yes',this)">คุ้มค่า</button>
+              <button class="yn-btn yn-no" onclick="setYN('q11_worth','no',this)">ไม่คุ้ม</button>
+            </div>
+          </div>
+          <div id="q11_worth_no_wrap" style="display:none">
+            <div class="q-note"><label>อะไรที่ทำให้ไม่คุ้ม?</label><textarea id="q11_not_worth" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+          </div>
+          <div class="q-note"><label>เพราะอะไร? (ขยายความ)</label><textarea id="q11_reason" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+        </div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="q-block">
+        <div class="q-num">Q12</div>
+        <div class="q-text">ถ้ามีแอปที่เปลี่ยนการนั่งท่องศัพท์ทั่วไป เป็นการจำลองการใช้คำศัพท์จากสถานการณ์จริงรอบตัวคุณ คุณคิดว่าจะช่วยให้จำได้ดีขึ้นไหมครับ?</div>
+        <div class="q-note">
+          <label>คิดว่าจะช่วยให้จำได้ดีขึ้นไหม?</label>
+          <div class="yn-row">
+            <button class="yn-btn yn-yes" onclick="setYN('q12_helps','yes',this)">ช่วยได้</button>
+            <button class="yn-btn yn-no" onclick="setYN('q12_helps','no',this)">ไม่แน่ใจ / ไม่ช่วย</button>
+          </div>
+        </div>
+        <div class="q-note"><label>เพราะอะไร? (ขยายความ)</label><textarea id="q12_note" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+
+        <div class="q-note">
+          <label>ถ้าตอบผิดจะเลือดลด — รู้สึกเหมือนถูกท้าทาย หรือดูน่ากลัวเกินไป?</label>
+          <div class="yn-row">
+            <button class="yn-btn yn-yes" onclick="setYN('q12_gamify_feel','challenge',this)" style="flex:1.5">รู้สึกถูกท้าทาย</button>
+            <button class="yn-btn yn-no" onclick="setYN('q12_gamify_feel','scary',this)" style="flex:1.5">ดูน่ากลัวเกินไป</button>
+          </div>
+        </div>
+        <div class="q-note"><label>ขยายความ</label><textarea id="q12_gamify" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+
+        <div class="q-note">
+          <label>ถ้าแอปให้ Mission ไปลองพูดที่ทำงานพรุ่งนี้เลย คุณคิดว่าตัวเองกล้าทำไหมครับ?</label>
+          <div class="yn-row">
+            <button class="yn-btn yn-yes" onclick="setYN('q12_mission_brave','yes',this)">กล้าทำ</button>
+            <button class="yn-btn yn-no" onclick="setYN('q12_mission_brave','no',this)">ไม่กล้า / ไม่แน่ใจ</button>
+          </div>
+        </div>
+        <div class="q-note"><label>ขยายความ</label><textarea id="q12_mission" placeholder="บรรยาย..." oninput="updateProgress()"></textarea></div>
+      </div>
+
+      <!-- Contact -->
+      <div class="q-block">
+        <div class="q-num">ข้อมูลติดต่อ (ไม่บังคับ)</div>
+        <div class="q-text">ถ้าสนใจติดตามความคืบหน้าของแอปนี้ ฝากเบอร์หรือ Line ไว้ได้เลยครับ</div>
+        <div class="q-note">
+          <label>เบอร์โทร / Line ID</label>
+          <textarea id="contact_info" placeholder="ใส่หรือเว้นว่างก็ได้ครับ..." style="min-height:48px" oninput="updateProgress()"></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" onclick="submitSurvey()">ส่งคำตอบ →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-card" id="success-card">
+    <h2>ขอบคุณมากนะครับ!</h2>
+    <p>สิ่งที่คุณเล่าวันนี้มีประโยชน์มาก ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว</p>
+    <div style="margin-top:1.5rem">
+      <button class="btn-secondary" onclick="resetForm()">กรอกใหม่</button>
+    </div>
+  </div>
+
+  <div class="admin-panel">
+    <div class="admin-header">
+      <span style="font-size:13px;font-weight:500;color:var(--sub)">ข้อมูลที่รวบรวม</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:12px;color:var(--sub)" id="sub-count">0 รายการ</span>
+        <button class="btn-excel" onclick="downloadExcel()">⬇ ดาวน์โหลด Excel</button>
+        <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="clearData()">ล้างข้อมูล</button>
+      </div>
+    </div>
+    <div id="data-preview" style="font-size:12px;color:var(--sub);font-style:italic">ยังไม่มีข้อมูล</div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+var db = [];
+var s1val=null, s2val=null, branches={}, ynVals={}, chipData={};
+try { var s=localStorage.getItem('survey_cd_db_v3'); if(s) db=JSON.parse(s); } catch(e){}
+
+function saveDb(){ try{localStorage.setItem('survey_cd_db_v3',JSON.stringify(db));}catch(e){} updateCount(); }
+function updateCount(){
+  var el=document.getElementById('sub-count'); if(el) el.textContent=db.length+' รายการ';
+  var prev=document.getElementById('data-preview');
+  if(db.length===0){prev.textContent='ยังไม่มีข้อมูล';return;}
+  prev.textContent='ล่าสุด: '+new Date(db[db.length-1].timestamp).toLocaleString('th-TH')+' · ทั้งหมด '+db.length+' รายการ';
+}
+function updateProgress(){
+  var ids=['q1_job','q2_situation','q2_others','q3_pressure','q3_future','q4_gap','q4_why','q5_note','q6_diff','q7_detail','q8_scenario','q8_context','q9_activity','q10_why_yes','q10_why_no','q11_reason','q12_note','q12_gamify','q12_mission'];
+  var filled=0; var total=25;
+  ids.forEach(function(id){var el=document.getElementById(id);if(el&&el.value.trim().length>1)filled++;});
+  ['q1_lang','q1_skill','q7_scenario','q7_freq','q8_situation','q9_when','q9_min','q3_pressure_type'].forEach(function(k){if(chipData[k]&&chipData[k].length>0)filled++;});
+  var pct=Math.min(100,Math.round((filled/total)*100));
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('prog-label').textContent='ความคืบหน้า '+pct+'%';
+}
+
+function toggleChip(el,key){
+  el.classList.toggle('selected');
+  if(!chipData[key])chipData[key]=[];
+  var label=el.textContent.trim();
+  var idx=chipData[key].indexOf(label);
+  if(idx===-1)chipData[key].push(label); else chipData[key].splice(idx,1);
+  updateProgress();
+}
+function toggleChipOther(el,key,inputId){
+  el.classList.toggle('selected');
+  var inp=document.getElementById(inputId);
+  inp.classList.toggle('visible',el.classList.contains('selected'));
+  if(!el.classList.contains('selected')){inp.value='';if(chipData[key]){var idx=chipData[key].indexOf('__other__');if(idx!==-1)chipData[key].splice(idx,1);}}
+  else{if(!chipData[key])chipData[key]=[];if(chipData[key].indexOf('__other__')===-1)chipData[key].push('__other__');}
+  updateProgress();
+}
+function toggleChipSingle(el,key){
+  var group=el.closest('.chip-group');
+  group.querySelectorAll('.chip').forEach(function(c){c.classList.remove('selected');});
+  var otherInp=group.parentElement.querySelector('.other-input');
+  if(otherInp){otherInp.classList.remove('visible');otherInp.value='';}
+  el.classList.add('selected');
+  chipData[key]=[el.textContent.trim()];
+  updateProgress();
+}
+function toggleChipOtherSingle(el,key,inputId){
+  var group=el.closest('.chip-group');
+  group.querySelectorAll('.chip').forEach(function(c){c.classList.remove('selected');});
+  el.classList.add('selected');
+  var inp=document.getElementById(inputId);
+  inp.classList.add('visible');
+  chipData[key]=['__other__'];
+  updateProgress();
+}
+
+function setYN(key,val,btn){
+  ynVals[key]=val;
+  var row=btn.closest('.yn-row');
+  row.querySelectorAll('.yn-btn').forEach(function(b){b.classList.remove('selected');});
+  btn.classList.add('selected');
+  if(key==='q11_paid'){
+    var wrap=document.getElementById('q11_paid_yes');
+    wrap.classList.toggle('visible',val==='yes');
+    if(val!=='yes'){ynVals['q11_worth']=null;document.getElementById('q11_worth_no_wrap').style.display='none';}
+  }
+  if(key==='q11_worth'){document.getElementById('q11_worth_no_wrap').style.display=val==='no'?'block':'none';}
+  updateProgress();
+}
+
+function setScreen1(val,btn){
+  s1val=val;
+  btn.closest('.branch-row').querySelectorAll('.branch-btn').forEach(function(b){b.classList.remove('selected');});
+  btn.classList.add('selected');
+  if(val==='yes'){document.getElementById('s2-wrap').style.display='block';document.getElementById('rejected').classList.remove('show');}
+  else{document.getElementById('s2-wrap').style.display='none';document.getElementById('rejected').classList.add('show');document.getElementById('main-form').style.display='none';}
+}
+function setScreen2(val,btn){
+  s2val=val;
+  btn.closest('.branch-row').querySelectorAll('.branch-btn').forEach(function(b){b.classList.remove('selected');});
+  btn.classList.add('selected');
+  if(val==='yes'){document.getElementById('main-form').style.display='block';document.getElementById('rejected').classList.remove('show');}
+  else{document.getElementById('main-form').style.display='none';document.getElementById('rejected').classList.add('show');}
+}
+function branch(q,val,btn){
+  branches[q]=val;
+  btn.closest('.branch-row').querySelectorAll('.branch-btn').forEach(function(b){b.classList.remove('selected');});
+  btn.classList.add('selected');
+  ['yes','no','phrase','vocab'].forEach(function(k){var el=document.getElementById(q+'-'+k);if(el)el.classList.toggle('visible',k===val);});
+}
+
+function getVal(id){var el=document.getElementById(id);return el?el.value.trim():'';}
+function getChips(key,otherId){
+  var vals=(chipData[key]||[]).filter(function(v){return v!=='__other__';});
+  if(otherId){var o=document.getElementById(otherId);if(o&&o.value.trim())vals.push(o.value.trim());}
+  return vals.join(', ');
+}
+
+function submitSurvey(){
+  var record={
+    timestamp:new Date().toISOString(),
+    screen1:s1val, screen2:s2val,
+    q1_job:getVal('q1_job'), q1_lang:getChips('q1_lang','q1_lang_other'), q1_skill:getChips('q1_skill',null),
+    q2_branch:branches['q2']||'', q2_situation:getVal('q2_situation'), q2_others:getVal('q2_others'),
+    q3_branch:branches['q3']||'', q3_pressure_type:getChips('q3_pressure_type','q3_pressure_other'), q3_pressure:getVal('q3_pressure'), q3_future:getVal('q3_future'),
+    q4_branch:branches['q4']||'', q4_gap:getVal('q4_gap'), q4_why:getVal('q4_why'),
+    q5_note:getVal('q5_note'), q5_examples:getVal('q5_examples'),
+    q6_happened:ynVals['q6_happened']||'', q6_diff:getVal('q6_diff'),
+    q7_scenario:getChips('q7_scenario','q7_scenario_other'), q7_detail:getVal('q7_detail'), q7_freq:getChips('q7_freq','q7_freq_other'),
+    q8_branch:branches['q8']||'', q8_situation:getChips('q8_situation','q8_situation_other'), q8_scenario:getVal('q8_scenario'), q8_vocab_work:ynVals['q8_vocab_work']||'', q8_context:getVal('q8_context'),
+    q9_when:getChips('q9_when','q9_when_other'), q9_min:getChips('q9_min','q9_min_other'), q9_activity:getVal('q9_activity'),
+    q10_branch:branches['q10']||'', q10_why_yes:getVal('q10_why_yes'), q10_why_no:getVal('q10_why_no'),
+    q11_paid:ynVals['q11_paid']||'', q11_worth:ynVals['q11_worth']||'', q11_not_worth:getVal('q11_not_worth'), q11_reason:getVal('q11_reason'),
+    q12_helps:ynVals['q12_helps']||'', q12_note:getVal('q12_note'),
+    q12_gamify_feel:ynVals['q12_gamify_feel']||'', q12_gamify:getVal('q12_gamify'),
+    q12_mission_brave:ynVals['q12_mission_brave']||'', q12_mission:getVal('q12_mission'),
+    contact_info:getVal('contact_info')
+  };
+  db.push(record); saveDb();
+  document.getElementById('survey-form').style.display='none';
+  document.getElementById('success-card').classList.add('show');
+}
+
+function resetForm(){
+  document.getElementById('survey-form').style.display='block';
+  document.getElementById('success-card').classList.remove('show');
+  document.getElementById('main-form').style.display='none';
+  document.getElementById('s2-wrap').style.display='none';
+  document.getElementById('rejected').classList.remove('show');
+  document.querySelectorAll('textarea,input[type=text]').forEach(function(t){t.value='';});
+  document.querySelectorAll('.branch-btn,.yn-btn').forEach(function(b){b.classList.remove('selected');});
+  document.querySelectorAll('.branch-section').forEach(function(s){s.classList.remove('visible');});
+  document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('selected');});
+  document.querySelectorAll('.other-input').forEach(function(i){i.classList.remove('visible');i.value='';});
+  document.getElementById('q11_worth_no_wrap').style.display='none';
+  s1val=null;s2val=null;branches={};ynVals={};chipData={};
+  document.getElementById('prog-fill').style.width='0%';
+  document.getElementById('prog-pct').textContent='0%';
+  document.getElementById('prog-label').textContent='ความคืบหน้า 0%';
+}
+
+function downloadExcel(){
+  if(db.length===0){alert('ยังไม่มีข้อมูล');return;}
+  var headers=['Timestamp','Screen1','Screen2',
+    'Q1 งาน','Q1 ภาษาที่ใช้','Q1 ทักษะหลัก',
+    'Q2 ประสบการณ์','Q2 สถานการณ์','Q2 คนรอบข้าง',
+    'Q3 แรงกดดัน','Q3 ประเภทแรงกดดัน','Q3 รายละเอียด','Q3 อนาคต',
+    'Q4 ช่วยได้ไหม','Q4 Gap','Q4 เหตุผล',
+    'Q5 ความตรง','Q5 ตัวอย่าง',
+    'Q6 เคยเกิดขึ้นไหม','Q6 ความต่าง',
+    'Q7 Scenario','Q7 รายละเอียด','Q7 ความถี่',
+    'Q8 เลือกอะไร','Q8 Situation ที่อยากได้ Script','Q8 รายละเอียด','Q8 Vocab Work ไหม','Q8 บริบท',
+    'Q9 ช่วงเวลาว่าง','Q9 นาทีต่อครั้ง','Q9 กิจกรรม',
+    'Q10 Mission','Q10 เหตุผลทำ','Q10 เหตุผลไม่ทำ',
+    'Q11 เคยจ่าย','Q11 คุ้มค่า','Q11 ไม่คุ้มเพราะ','Q11 เหตุผล',
+    'Q12 ช่วยได้ไหม','Q12 อธิบาย','Q12 Gamify รู้สึกอย่างไร','Q12 Gamify ขยายความ','Q12 Mission กล้าไหม','Q12 Mission ขยายความ',
+    'ติดต่อ'];
+  var rows=db.map(function(r){return[
+    r.timestamp,r.screen1,r.screen2,
+    r.q1_job,r.q1_lang,r.q1_skill,
+    r.q2_branch,r.q2_situation,r.q2_others,
+    r.q3_branch,r.q3_pressure_type,r.q3_pressure,r.q3_future,
+    r.q4_branch,r.q4_gap,r.q4_why,
+    r.q5_note,r.q5_examples,
+    r.q6_happened,r.q6_diff,
+    r.q7_scenario,r.q7_detail,r.q7_freq,
+    r.q8_branch,r.q8_situation,r.q8_scenario,r.q8_vocab_work,r.q8_context,
+    r.q9_when,r.q9_min,r.q9_activity,
+    r.q10_branch,r.q10_why_yes,r.q10_why_no,
+    r.q11_paid,r.q11_worth,r.q11_not_worth,r.q11_reason,
+    r.q12_helps,r.q12_note,r.q12_gamify_feel,r.q12_gamify,r.q12_mission_brave,r.q12_mission,
+    r.contact_info
+  ];});
+  var ws=XLSX.utils.aoa_to_sheet([headers].concat(rows));
+  ws['!cols']=headers.map(function(){return{wch:24};});
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Customer Discovery');
+  XLSX.writeFile(wb,'customer_discovery_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+
+function clearData(){
+  if(!confirm('ล้างข้อมูลทั้งหมดใช่ไหม?'))return;
+  db=[];saveDb();
+  document.getElementById('data-preview').textContent='ยังไม่มีข้อมูล';
+}
+
+updateCount();
+</script>
